@@ -10,13 +10,13 @@ Lets you use more than one content "block" on a template. You only have to inser
 
 == Description ==
 
-With this plug-in, you can use more than one content “block” on a template. You only have to insert one tag inside the template, so it’s easy to use.
+With this plug-in, you can use more than one content &quot;block&quot; on a template. You only have to insert one tag inside the template, so it’s easy to use.
 
 I made this plug-in because I think it is essential to any CMS to be able to use more content blocks in one template. I really missed this functionality in Wordpress and I did not find a decent plug-in for this, so I made one myself.
 
-What is a “multiple content block”?
+<strong>What is a &quot;multiple content block&quot;?</strong>
 
-When you make a Wordpress template, you can show the content of the current page by using the code the_content();, but when you have (for example) several columns, you cannot split these in different content “blocks”.
+When you make a Wordpress template, you can show the content of the current page by using the code `the_content();`, but when you have (for example) several columns, you cannot split these in different content &quot;blocks&quot;.
 
 You want your clients to edit the content themselves without screwing up any code. This is where our plug-in comes in.
 
@@ -36,7 +36,7 @@ If you have any questions or tips, please contact me at harold@trendwerk.nl or l
 
 = How do I filter the content? =
 
-You can set the second parameter to false, like this: <?php $content_to_edit = the_block('blockname',false); ?> and you can now edit this variable with 
+You can set the second parameter to false, like this: `<?php $content_to_edit = the_block('blockname',false); ?>` and you can now edit this variable with PHP.
 
 
 == Screenshots ==
