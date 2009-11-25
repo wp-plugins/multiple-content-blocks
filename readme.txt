@@ -1,5 +1,5 @@
 === Plugin Name ===
-Contributors: Harold Angenent
+Contributors: Ontwerpstudio Trendwerk, Harold Angenent
 Donate link: http://plugins.trendwerk.nl
 Tags: multiple,content,blocks,multiplecontent,page,pageblocks
 Requires at least: 2.8
@@ -9,10 +9,6 @@ Stable tag: 1.0
 Lets you use more than one content "block" on a template. You only have to insert one tag inside the template, so it's easy to use.
 
 == Description ==
-
---
-Why
---
 
 With this plug-in, you can use more than one content “block” on a template. You only have to insert one tag inside the template, so it’s easy to use.
 
@@ -24,32 +20,6 @@ When you make a Wordpress template, you can show the content of the current page
 
 You want your clients to edit the content themselves without screwing up any code. This is where our plug-in comes in.
 
---
-Installation
---
-
-To install this plug-in, download the files and extract them to your plug-ins folder. You can also download this plug-in by searching in Wordpress.
-
-For tips on how to use this plug-in, scroll to How to use
-
-
---
-How to use
---
-
-We made our plugin so it’s easy to use for developers.
-
-You can create a new content block in your template by using for example this code: <?php the_block('blockname'); ?>
-
-You can place this in a div to style it however you want to.
-
-Every page that uses this template now has an editor on it with ‘name’ above it. You can use as many as you like.
-
---
-Action?
---
-
-Ofcourse, now there is no action or filter you can use to edit this content. If you want to edit the content with php, you can set the second parameter to false, like this: <?php $content_to_edit = the_block('blockname',false); ?>
 
 
 If you have any questions or tips, please contact me at harold@trendwerk.nl or leave  a comment on the blog.
