@@ -10,7 +10,7 @@ Lets you use more than one content "block" on a template. You only have to inser
 
 == Description ==
 
-With this plug-in, you can use more than one content &quot;block&quot; on a template. You only have to insert one tag inside the template, so it’s easy to use.
+With this plug-in, you can use more than one content &quot;block&quot; on a template. You only have to insert one tag inside the template, so its easy to use.
 
 I made this plug-in because I think it is essential to any CMS to be able to use more content blocks in one template. I really missed this functionality in Wordpress and I did not find a decent plug-in for this, so I made one myself.
 
@@ -22,7 +22,7 @@ You want your clients to edit the content themselves without screwing up any cod
 
 
 
-If you have any questions or tips, please contact me at harold@trendwerk.nl or leave  a comment on the blog.
+If you have any questions or tips, please contact me at harold@trendwerk.nl or leave  a comment on <a href="http://plugins.trendwerk.nl/">the blog</a>.
 
 
 == Installation ==
