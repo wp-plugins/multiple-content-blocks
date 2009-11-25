@@ -1,11 +1,11 @@
 <?php
 /*
 Plugin Name: Multiple content blocks
-Plugin URI: http://plugins.trendwerk.nl/
+Plugin URI: http://plugins.trendwerk.nl/documentation/multiple-content-blocks/
 Description: Lets you use more than one content "block" on a template. You only have to insert one tag inside the template, so it's easy to use.
 Version: 1.0
 Author: Ontwerpstudio Trendwerk
-Author URI: http://www.trendwerk.nl/
+Author URI: http://plugins.trendwerk.nl/
 */
 
 
