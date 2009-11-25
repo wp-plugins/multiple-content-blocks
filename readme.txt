@@ -52,7 +52,5 @@ You can set the second parameter to false, like this: `<?php $content_to_edit = 
 
 == Quick list ==
 
-Ordered list:
-
 * Create your own content blocks in a template
 * Fill them with a WYSIWYG Editor
