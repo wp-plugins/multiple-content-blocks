@@ -50,14 +50,9 @@ You can set the second parameter to false, like this: `<?php $content_to_edit = 
 * Plugin created
 
 
-== A brief Markdown Example ==
+== Quick list ==
 
 Ordered list:
-
-1. Create your own content blocks in a template
-2. Fill them with a WYSIWYG Editor
-
-Unordered list:
 
 * Create your own content blocks in a template
 * Fill them with a WYSIWYG Editor
