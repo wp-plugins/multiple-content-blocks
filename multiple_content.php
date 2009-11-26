@@ -3,7 +3,7 @@
 Plugin Name: Multiple content blocks
 Plugin URI: http://plugins.trendwerk.nl/documentation/multiple-content-blocks/
 Description: Lets you use more than one content "block" on a template. You only have to insert one tag inside the template, so it's easy to use.
-Version: 1.0
+Version: 1.1
 Author: Ontwerpstudio Trendwerk
 Author URI: http://plugins.trendwerk.nl/
 */
@@ -28,11 +28,83 @@ function add_multiplecontent_box() {
 	}
 	$fileToRead = validate_file_to_edit($fileToRead, $allowed_files);
 	$fileToRead = get_real_file_to_edit($fileToRead);
+
 	$f = fopen($fileToRead, 'r');
 	$contents = fread($f, filesize($fileToRead));
 	$contents = htmlspecialchars( $contents );
 	
+	//read the templates header, sidebar and footer, added in v1.1
+		//header
+		$theHeader = strstr($contents," get_header(");
+		$theHeader = str_replace(' get_header(','',$theHeader);
+		if(strpos($theHeader,');') != 0) {
+			$theHeader = substr($theHeader,1, strpos($theHeader,');')-2);
+		} else {
+			$theHeader = '';
+		}
+		
+		$fileToRead = get_template_directory_uri().'/'; 
+		$fileToRead .= 'header';
+		if($theHeader) {
+			$fileToRead .= '-'.$theHeader;
+		}
+		$fileToRead .= '.php';
+		$fileToRead = strstr($fileToRead,'/themes/');
+		$fileToRead = validate_file_to_edit($fileToRead, $allowed_files);
+		$fileToRead = get_real_file_to_edit($fileToRead);
+		
+		$f = fopen($fileToRead, 'r');
+		$headercontents = fread($f, filesize($fileToRead));
+		$headercontents = htmlspecialchars( $headercontents );
+		
+		//footer
+		$theFooter = strstr($contents," get_footer(");
+		$theFooter = str_replace(' get_footer(','',$theFooter);
+		if(strpos($theFooter,');') != 0) {
+			$theFooter = substr($theFooter,1, strpos($theFooter,');')-2);
+		} else {
+			$theFooter = '';
+		}
+		
+		$fileToRead = get_template_directory_uri().'/'; 
+		$fileToRead .= 'footer';
+		if($theFooter) {
+			$fileToRead .= '-'.$theFooter;
+		}
+		$fileToRead .= '.php';
+		$fileToRead = strstr($fileToRead,'/themes/');
+		$fileToRead = validate_file_to_edit($fileToRead, $allowed_files);
+		$fileToRead = get_real_file_to_edit($fileToRead);
+
+		$f = fopen($fileToRead, 'r');
+		$footercontents = fread($f, filesize($fileToRead));
+		$footercontents = htmlspecialchars( $footercontents );
+		
+		//sidebar
+		$theSidebar = strstr($contents," get_sidebar(");
+		$theSidebar = str_replace(' get_sidebar(','',$theSidebar);
+		if(strpos($theSidebar,');') != 0) {
+			$theSidebar = substr($theSidebar,1, strpos($theSidebar,');')-2);
+		} else {
+			$theSidebar = '';
+		}
+		
+		$fileToRead = get_template_directory_uri().'/'; 
+		$fileToRead .= 'sidebar';
+		if($theSidebar) {
+			$fileToRead .= '-'.$theSidebar;
+		}
+		$fileToRead .= '.php';
+		$fileToRead = strstr($fileToRead,'/themes/');
+		$fileToRead = validate_file_to_edit($fileToRead, $allowed_files);
+		$fileToRead = get_real_file_to_edit($fileToRead);
+
+		$f = fopen($fileToRead, 'r');
+		$sidebarcontents = fread($f, filesize($fileToRead));
+		$sidebarcontents = htmlspecialchars( $sidebarcontents );
 	
+	$contents = $headercontents.$contents.$sidebarcontents.$footercontents;
+		
 	//check how many content field there have to be
 	$editors = substr_count($contents," the_block(");
 	
