@@ -11,9 +11,23 @@ Author URI: http://plugins.trendwerk.nl/
 
 function init_multiplecontent() {
 	add_meta_box('multi_content',__('Multiple content blocks','trendwerk'),'add_multiplecontent_box','page','normal','high');
+	add_meta_box('multi_content',__('Multiple content blocks','trendwerk'),'add_multiplecontent_box','post','normal','high');
 }
 
 add_action('admin_init','init_multiplecontent');
+
+
+function multiplecontent_css() {
+	echo '
+	<style type="text/css">
+		.js .theEditor, #editorcontainer #content {
+			color: #000 !important;
+		}
+	</style>
+	';
+}
+
+add_action('admin_head','multiplecontent_css');
 
 
 function add_multiplecontent_box() {
@@ -24,86 +38,32 @@ function add_multiplecontent_box() {
 	//read the template
 	$fileToRead = strstr($fileToRead,'/themes/');
 	if(substr(strrchr($fileToRead,'/'),1) == 'default') {
-		$fileToRead = str_replace('default','page.php',$fileToRead);
+		$fileToRead = substr($fileToRead, 0 ,-7) . 'page.php';
+	}
+	if(!substr(strrchr($fileToRead,'/'),1) && $post->post_type == 'post') {
+		$fileToRead .= 'single.php';
 	}
 	$fileToRead = validate_file_to_edit($fileToRead, $allowed_files);
 	$fileToRead = get_real_file_to_edit($fileToRead);
+
 
 	$f = fopen($fileToRead, 'r');
 	$contents = fread($f, filesize($fileToRead));
 	$contents = htmlspecialchars( $contents );
 	
 	//read the templates header, sidebar and footer, added in v1.1
-		//header
-		$theHeader = strstr($contents," get_header(");
-		$theHeader = str_replace(' get_header(','',$theHeader);
-		if(strpos($theHeader,');') != 0) {
-			$theHeader = substr($theHeader,1, strpos($theHeader,');')-2);
-		} else {
-			$theHeader = '';
+		$headercontents = read_tag('header',$contents);
+		$footercontents = read_tag('footer',$contents);
+		
+		//multiple sidebars, v1.2
+		$amount_sidebars = substr_count($contents,'get_sidebar(');
+		$nextContent = $contents;
+		for($i=0;$i<$amount_sidebars;$i++) {
+			$sidebarcontents .= read_tag('sidebar',$nextContent);
+			$nextContent = substr(strstr($contents,'get_sidebar('),13);
 		}
 		
-		$fileToRead = get_template_directory_uri().'/'; 
-		$fileToRead .= 'header';
-		if($theHeader) {
-			$fileToRead .= '-'.$theHeader;
-		}
-		$fileToRead .= '.php';
-		$fileToRead = strstr($fileToRead,'/themes/');
-		$fileToRead = validate_file_to_edit($fileToRead, $allowed_files);
-		$fileToRead = get_real_file_to_edit($fileToRead);
-		
-		$f = fopen($fileToRead, 'r');
-		$headercontents = fread($f, filesize($fileToRead));
-		$headercontents = htmlspecialchars( $headercontents );
-		
-		//footer
-		$theFooter = strstr($contents," get_footer(");
-		$theFooter = str_replace(' get_footer(','',$theFooter);
-		if(strpos($theFooter,');') != 0) {
-			$theFooter = substr($theFooter,1, strpos($theFooter,');')-2);
-		} else {
-			$theFooter = '';
-		}
-		
-		$fileToRead = get_template_directory_uri().'/'; 
-		$fileToRead .= 'footer';
-		if($theFooter) {
-			$fileToRead .= '-'.$theFooter;
-		}
-		$fileToRead .= '.php';
-		$fileToRead = strstr($fileToRead,'/themes/');
-		$fileToRead = validate_file_to_edit($fileToRead, $allowed_files);
-		$fileToRead = get_real_file_to_edit($fileToRead);
-
-		$f = fopen($fileToRead, 'r');
-		$footercontents = fread($f, filesize($fileToRead));
-		$footercontents = htmlspecialchars( $footercontents );
-		
-		//sidebar
-		$theSidebar = strstr($contents," get_sidebar(");
-		$theSidebar = str_replace(' get_sidebar(','',$theSidebar);
-		if(strpos($theSidebar,');') != 0) {
-			$theSidebar = substr($theSidebar,1, strpos($theSidebar,');')-2);
-		} else {
-			$theSidebar = '';
-		}
-		
-		$fileToRead = get_template_directory_uri().'/'; 
-		$fileToRead .= 'sidebar';
-		if($theSidebar) {
-			$fileToRead .= '-'.$theSidebar;
-		}
-		$fileToRead .= '.php';
-		$fileToRead = strstr($fileToRead,'/themes/');
-		$fileToRead = validate_file_to_edit($fileToRead, $allowed_files);
-		$fileToRead = get_real_file_to_edit($fileToRead);
-
-		$f = fopen($fileToRead, 'r');
-		$sidebarcontents = fread($f, filesize($fileToRead));
-		$sidebarcontents = htmlspecialchars( $sidebarcontents );
-	
-	$contents = $headercontents.$contents.$sidebarcontents.$footercontents;
+		$contents = $headercontents.$contents.$sidebarcontents.$footercontents;
 		
 	//check how many content field there have to be
 	$editors = substr_count($contents," the_block(");
@@ -114,17 +74,26 @@ function add_multiplecontent_box() {
 		$stringFirst = strstr($nextString,' the_block(');
 		$stringFirst = substr($stringFirst,1);
 		$stringLast = strstr($stringFirst,');');
-		$editorName = str_replace('\'','',str_replace('the_block(','',str_replace($stringLast,'',$stringFirst)));
+		//remove single and double quotes
+		$editorName = str_replace('\'','', str_replace('&quot;','',str_replace('the_block(','',str_replace($stringLast,'',$stringFirst))));
 		$nextString = $stringLast;
 		
 		//add editor
 		echo '<p><strong>'.ucfirst($editorName).'</strong></p>';
 		echo '<input type="hidden" name="multiplecontent_box-'.$i.'" value="'.$editorName.'" />';
-		echo '<a id="edButtonHTML" class="hide-if-no-js" onclick="switchEditors.go(\'multiplecontent_box-'.$editorName.'\', \'html\');">HTML</a><a id="edButtonPreview" class="active hide-if-no-js" onclick="switchEditors.go(\'multiplecontent_box-'.$editorName.'\', \'tinymce\');">Wysiwyg</a>';
+		
+		global $current_user;
+		get_currentuserinfo();
+		
+		if(get_usermeta($current_user->ID,'rich_editing') == 'true') {
+			//leave this away when wysigwyg is disabled
+			echo '<a id="edButtonHTML" class="hide-if-no-js" onclick="switchEditors.go(\'multiplecontent_box-'.$editorName.'\', \'html\');">HTML</a><a id="edButtonPreview" class="active hide-if-no-js" onclick="switchEditors.go(\'multiplecontent_box-'.$editorName.'\', \'tinymce\');">Wysiwyg</a>';
+		}
+		
 		echo '<input type="hidden" name="multiplecontent_box-'.$editorName.'-nonce" id="multiplecontent_box-'.$editorName.'-nonce" value="'.wp_create_nonce("multiplecontent_box-".$editorName."-nonce").'" />'."\n";  //nonce
 		echo '<textarea id="multiplecontent_box-'.$editorName.'" tabindex="2" name="multiplecontent_box-'.$editorName.'" cols="158" class="theEditor" rows="15">';
 			$content = get_post_meta($post->ID, '_ot_multiplecontent_box-'.$editorName , true);
-			echo $content;
+			echo apply_filters('the_editor_content', $content);
 		echo '</textarea>';
 		echo '<p>&nbsp;</p>';
 	}
@@ -134,11 +103,43 @@ function add_multiplecontent_box() {
 	}
 }
 
+function read_tag($tag,$contents) {
+	$theTag = strstr($contents,'get_'.$tag.'(');
+	//when the tag doesnt exist, return nothing, or it will take the standard file
+	if(!$theTag) {
+		return '';
+	}
+	
+	$theTag = str_replace('get_'.$tag.'(','',$theTag);
+	if(strpos($theTag,');') != 0) {
+		$theTag = substr($theTag,1, strpos($theTag,');')-2);
+	} else {
+		$theTag = '';
+	}
+	
+	$fileToRead = get_template_directory_uri().'/'; 
+	$fileToRead .= $tag;
+	if($theTag) {
+		$fileToRead .= '-'.$theTag;
+	}
+	$fileToRead .= '.php';
+	$fileToRead = strstr($fileToRead,'/themes/');
+	$fileToRead = validate_file_to_edit($fileToRead, $allowed_files);
+	$fileToRead = get_real_file_to_edit($fileToRead);
+
+
+	$f = fopen($fileToRead, 'r');
+	$tagContents = fread($f, filesize($fileToRead));
+	$tagContents = htmlspecialchars( $tagContents );
+	
+	return $tagContents;
+}
+
 function save_multiplecontent_box($id) {
 	for($i=0;$i>-1;$i++) {
 		if (!wp_verify_nonce($_POST['multiplecontent_box-'.$_POST['multiplecontent_box-'.$i].'-nonce'],"multiplecontent_box-".$_POST['multiplecontent_box-'.$i]."-nonce")) return $id; //nonce
 		
-		if($_POST['multiplecontent_box-'.$_POST['multiplecontent_box-'.$i]]) {
+		if(isset($_POST['multiplecontent_box-'.$_POST['multiplecontent_box-'.$i]])) {
 			
 			$contents = '';
 			$contents = apply_filters('content_save_pre',$_POST['multiplecontent_box-'.$_POST['multiplecontent_box-'.$i]]);
@@ -163,9 +164,9 @@ function the_block($blockName,$return=true) {
 		global $post;
 		$content =  get_post_meta($post->ID, '_ot_multiplecontent_box-'.$blockName , true);
 		if(!$return) {
-			return $content;
+			return apply_filters('the_content', $content);
 		} else {
-			echo $content;
+			echo apply_filters('the_content', $content);
 		}
 	}
 }

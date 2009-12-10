@@ -4,7 +4,7 @@ Donate link: http://plugins.trendwerk.nl
 Tags: multiple,content,blocks,multiplecontent,page,pageblocks
 Requires at least: 2.8
 Tested up to: 2.8.6
-Stable tag: 1.1
+Stable tag: 1.2
 
 Lets you use more than one content "block" on a template. You only have to insert one tag inside the template, so it's easy to use.
 
@@ -45,6 +45,16 @@ You can set the second parameter to false, like this: `<?php $content_to_edit = 
 2. The edit page will get the editors
 
 == Changelog ==
+
+= 1.2 =
+Alot of bugfixes and small things
+
+* You can now use multiple sidebars
+* Added the_content filters
+* Fixed the bugs with the default theme
+* Posts are supported as well
+* Double quote bug fixed
+* HTML is better supported
 
 = 1.1 =
 * You can now use the_block in your (custom) header, footer and sidebar template files.
