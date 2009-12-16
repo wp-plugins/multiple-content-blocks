@@ -3,7 +3,7 @@
 Plugin Name: Multiple content blocks
 Plugin URI: http://plugins.trendwerk.nl/documentation/multiple-content-blocks/
 Description: Lets you use more than one content "block" on a template. You only have to insert one tag inside the template, so it's easy to use.
-Version: 1.2
+Version: 1.3
 Author: Ontwerpstudio Trendwerk
 Author URI: http://plugins.trendwerk.nl/
 */
@@ -66,16 +66,33 @@ function add_multiplecontent_box() {
 		$contents = $headercontents.$contents.$sidebarcontents.$footercontents;
 		
 	//check how many content field there have to be
-	$editors = substr_count($contents," the_block(");
+	$editors = substr_count($contents,"the_block(");
 	
 	$nextString = $contents;	
 	for($i=0;$i<$editors;$i++) {
+		//check whether the next one is a get_the_block or the_block
+		$get = false;
+		
+		$firstThe = strpos($nextString,' the_block');
+		$firstGet = strpos($nextString,'get_the_block');
+		if($firstThe > $firstGet && $firstGet != 0) { //get_the_block is first
+			$get = true;
+		}
+		
 		//get the name from it
-		$stringFirst = strstr($nextString,' the_block(');
+		$stringFirst = strstr($nextString,' the_block(');		
+		if($get) {
+			$stringFirst = " ".strstr($nextString,'get_the_block(');
+		}
+		
 		$stringFirst = substr($stringFirst,1);
-		$stringLast = strstr($stringFirst,');');
+		$stringLast = strstr($stringFirst,')');
 		//remove single and double quotes
-		$editorName = str_replace('\'','', str_replace('&quot;','',str_replace('the_block(','',str_replace($stringLast,'',$stringFirst))));
+		if(!$get) {
+			$editorName = str_replace('\'','', str_replace('&quot;','',str_replace('the_block(','',str_replace($stringLast,'',$stringFirst))));
+		} else {
+			$editorName = str_replace('\'','', str_replace('&quot;','',str_replace('get_the_block(','',str_replace($stringLast,'',$stringFirst))));
+		}
 		$nextString = $stringLast;
 		
 		//add editor
@@ -159,15 +176,19 @@ add_action('save_post', 'save_multiplecontent_box');
 
 //front end
 
-function the_block($blockName,$return=true) {
+function the_block($blockName) {
 	if($blockName) {
 		global $post;
 		$content =  get_post_meta($post->ID, '_ot_multiplecontent_box-'.$blockName , true);
-		if(!$return) {
-			return apply_filters('the_content', $content);
-		} else {
-			echo apply_filters('the_content', $content);
-		}
+		echo apply_filters('the_content', $content);
+	}
+}
+
+function get_the_block($blockName) {
+	if($blockName) {
+		global $post;
+		$content =  get_post_meta($post->ID, '_ot_multiplecontent_box-'.$blockName , true);
+		return apply_filters('the_content', $content);
 	}
 }
 ?>
