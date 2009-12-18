@@ -3,11 +3,10 @@
 Plugin Name: Multiple content blocks
 Plugin URI: http://plugins.trendwerk.nl/documentation/multiple-content-blocks/
 Description: Lets you use more than one content "block" on a template. You only have to insert one tag inside the template, so it's easy to use.
-Version: 1.3
+Version: 1.3.1
 Author: Ontwerpstudio Trendwerk
 Author URI: http://plugins.trendwerk.nl/
 */
-
 
 function init_multiplecontent() {
 	add_meta_box('multi_content',__('Multiple content blocks','trendwerk'),'add_multiplecontent_box','page','normal','high');
@@ -37,8 +36,12 @@ function add_multiplecontent_box() {
 	
 	//read the template
 	$fileToRead = strstr($fileToRead,'/themes/');
-	if(substr(strrchr($fileToRead,'/'),1) == 'default') {
-		$fileToRead = substr($fileToRead, 0 ,-7) . 'page.php';
+	if(substr(strrchr($fileToRead,'/'),1) == 'default' || substr(strrchr($fileToRead,'/'),1) == '') { //fix for 2.9
+		if(substr(strrchr($fileToRead,'/'),1)) {
+			$fileToRead = substr($fileToRead, 0 ,-7) . 'page.php';
+		} else {
+			$fileToRead .= 'page.php';
+		}
 	}
 	if(!substr(strrchr($fileToRead,'/'),1) && $post->post_type == 'post') {
 		$fileToRead .= 'single.php';
@@ -75,7 +78,7 @@ function add_multiplecontent_box() {
 		
 		$firstThe = strpos($nextString,' the_block');
 		$firstGet = strpos($nextString,'get_the_block');
-		if($firstThe > $firstGet && $firstGet != 0) { //get_the_block is first
+		if(($firstThe > $firstGet && $firstGet != 0) || $firstThe == 0) { //get_the_block is first
 			$get = true;
 		}
 		
