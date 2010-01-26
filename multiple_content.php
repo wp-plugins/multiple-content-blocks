@@ -3,7 +3,7 @@
 Plugin Name: Multiple content blocks
 Plugin URI: http://plugins.trendwerk.nl/documentation/multiple-content-blocks/
 Description: Lets you use more than one content "block" on a template. You only have to insert one tag inside the template, so it's easy to use.
-Version: 1.3.1
+Version: 1.3
 Author: Ontwerpstudio Trendwerk
 Author URI: http://plugins.trendwerk.nl/
 */
@@ -21,6 +21,7 @@ function multiplecontent_css() {
 	<style type="text/css">
 		.js .theEditor, #editorcontainer #content {
 			color: #000 !important;
+			width: 100%;
 		}
 	</style>
 	';
@@ -46,11 +47,22 @@ function add_multiplecontent_box() {
 	if(!substr(strrchr($fileToRead,'/'),1) && $post->post_type == 'post') {
 		$fileToRead .= 'single.php';
 	}
+	
 	$fileToRead = validate_file_to_edit($fileToRead, $allowed_files);
 	$fileToRead = get_real_file_to_edit($fileToRead);
 
+	//first try to read the child theme, otherwise use the normal theme
+	$themes = get_themes();
+	$theme = $themes[get_current_theme()];
+	$current_theme_url = $theme['Template'];
+	$child_theme_url = str_replace('themes/','',strstr(get_stylesheet_directory_uri(),'themes/'));
 
-	$f = fopen($fileToRead, 'r');
+	if(fopen(str_replace($current_theme_url,$child_theme_url,$fileToRead), 'r')) { //child theme exists
+		$fileToRead = str_replace($current_theme_url,$child_theme_url,$fileToRead);
+		$f = fopen($fileToRead, 'r');
+	} else {
+		$f = fopen($fileToRead, 'r');
+	}
 	$contents = fread($f, filesize($fileToRead));
 	$contents = htmlspecialchars( $contents );
 	
@@ -105,6 +117,7 @@ function add_multiplecontent_box() {
 		global $current_user;
 		get_currentuserinfo();
 		
+
 		if(get_usermeta($current_user->ID,'rich_editing') == 'true') {
 			//leave this away when wysigwyg is disabled
 			echo '<a id="edButtonHTML" class="hide-if-no-js" onclick="switchEditors.go(\'multiplecontent_box-'.$editorName.'\', \'html\');">HTML</a><a id="edButtonPreview" class="active hide-if-no-js" onclick="switchEditors.go(\'multiplecontent_box-'.$editorName.'\', \'tinymce\');">Wysiwyg</a>';
@@ -131,8 +144,8 @@ function read_tag($tag,$contents) {
 	}
 	
 	$theTag = str_replace('get_'.$tag.'(','',$theTag);
-	if(strpos($theTag,');') != 0) {
-		$theTag = substr($theTag,1, strpos($theTag,');')-2);
+	if(strpos($theTag,')') != 0) {
+		$theTag = substr($theTag,1, strpos($theTag,')')-2);
 	} else {
 		$theTag = '';
 	}
@@ -148,7 +161,18 @@ function read_tag($tag,$contents) {
 	$fileToRead = get_real_file_to_edit($fileToRead);
 
 
-	$f = fopen($fileToRead, 'r');
+	//first try to read the child theme, otherwise use the normal theme
+	$themes = get_themes();
+	$theme = $themes[get_current_theme()];
+	$current_theme_url = $theme['Template'];
+	$child_theme_url = str_replace('themes/','',strstr(get_stylesheet_directory_uri(),'themes/'));
+
+	if(fopen(str_replace($current_theme_url,$child_theme_url,$fileToRead), 'r')) { //child theme exists
+		$fileToRead = str_replace($current_theme_url,$child_theme_url,$fileToRead);
+		$f = fopen($fileToRead, 'r');
+	} else {
+		$f = fopen($fileToRead, 'r');
+	}
 	$tagContents = fread($f, filesize($fileToRead));
 	$tagContents = htmlspecialchars( $tagContents );
 	
