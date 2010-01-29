@@ -4,7 +4,7 @@ Donate link: http://plugins.trendwerk.nl
 Tags: multiple,content,blocks,multiplecontent,page,pageblocks
 Requires at least: 2.8
 Tested up to: 2.9.1
-Stable tag: 1.4
+Stable tag: 1.4.1
 
 Lets you use more than one content "block" on a template. You only have to insert one tag inside the template, so it's easy to use.
 
@@ -45,6 +45,9 @@ Use the function get_the_block instead of the_block, like this: `<?php $content_
 2. The edit page will get the editors
 
 == Changelog ==
+
+= 1.4.1 =
+* Fixed a small bug when using MCB in Posts
 
 = 1.4 =
 * Now supports child themes!
