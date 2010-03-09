@@ -20,11 +20,6 @@ When you make a Wordpress template, you can show the content of the current page
 
 You want your clients to edit the content themselves without screwing up any code. This is where our plug-in comes in.
 
-
-
-If you have any questions or tips, please contact me at harold@trendwerk.nl or leave  a comment on <a href="http://plugins.trendwerk.nl/">the blog</a>.
-
-
 == Installation ==
 
 1. Extract the contents to the `/wp-content/plugins/multiple-content/` directory
