@@ -3,14 +3,17 @@
 Plugin Name: Multiple content blocks
 Plugin URI: http://plugins.trendwerk.nl/documentation/multiple-content-blocks/
 Description: Lets you use more than one content "block" on a template. You only have to insert one tag inside the template, so it's easy to use.
-Version: 1.5
+Version: 2.0
 Author: Ontwerpstudio Trendwerk
 Author URI: http://plugins.trendwerk.nl/
 */
 
 function init_multiplecontent() {
-	add_meta_box('multi_content',__('Multiple content blocks','cms'),'add_multiplecontent_box','page','normal','high');
-	add_meta_box('multi_content',__('Multiple content blocks','cms'),'add_multiplecontent_box','post','normal','high');
+	$posttypes = get_post_types();
+	
+	foreach($posttypes as $posttype) {
+		add_meta_box('multi_content',__('Multiple content blocks','trendwerk'),'add_multiplecontent_box',$posttype,'normal','high');
+	}
 }
 
 add_action('admin_init','init_multiplecontent');
@@ -41,14 +44,18 @@ function add_multiplecontent_box() {
 		if(substr(strrchr($fileToRead,'/'),1)) {
 			if($post->post_type == 'post') {
 				$fileToRead = substr($fileToRead, 0 ,-7) . 'single.php';
-			} else {
+			} else if($post->post_type == 'page') {
 				$fileToRead = substr($fileToRead, 0 ,-7) . 'page.php';
+			} else {
+				$fileToRead = substr($fileToRead, 0 ,-7) . 'single-'.$post->post_type.'.php';
 			}
 		} else {
 			if($post->post_type == 'post') {
 				$fileToRead .= 'single.php';
-			} else {
+			} else if($post->post_type == 'page') {
 				$fileToRead .= 'page.php';
+			} else {
+				$fileToRead .= 'single-'.$post->post_type.'.php';
 			}
 		}
 	}
