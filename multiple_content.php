@@ -67,15 +67,17 @@ function add_multiplecontent_box() {
 	$theme = $themes[get_current_theme()];
 	$current_theme_url = $theme['Template'];
 	$child_theme_url = str_replace('themes/','',strstr(get_stylesheet_directory_uri(),'themes/'));
-
-	if(fopen(str_replace($current_theme_url,$child_theme_url,$fileToRead), 'r')) { //child theme exists
-		$fileToRead = str_replace($current_theme_url,$child_theme_url,$fileToRead);
-		$f = fopen($fileToRead, 'r');
-	} else {
-		$f = fopen($fileToRead, 'r');
+	
+	if(file_exists(str_replace($current_theme_url,$child_theme_url,$fileToRead))) {
+		if(fopen(str_replace($current_theme_url,$child_theme_url,$fileToRead), 'r')) { //child theme exists
+			$fileToRead = str_replace($current_theme_url,$child_theme_url,$fileToRead);
+			$f = fopen($fileToRead, 'r');
+		} else {
+			$f = fopen($fileToRead, 'r');
+		}
+		$contents = fread($f, filesize($fileToRead));
+		$contents = htmlspecialchars( $contents );
 	}
-	$contents = fread($f, filesize($fileToRead));
-	$contents = htmlspecialchars( $contents );
 	
 	//read the templates header, sidebar and footer, added in v1.1
 		$headercontents = read_tag('header',$contents);
@@ -183,14 +185,16 @@ function read_tag($tag,$contents) {
 	$current_theme_url = $theme['Template'];
 	$child_theme_url = str_replace('themes/','',strstr(get_stylesheet_directory_uri(),'themes/'));
 
-	if(fopen(str_replace($current_theme_url,$child_theme_url,$fileToRead), 'r')) { //child theme exists
-		$fileToRead = str_replace($current_theme_url,$child_theme_url,$fileToRead);
-		$f = fopen($fileToRead, 'r');
-	} else {
-		$f = fopen($fileToRead, 'r');
+	if(file_exists(str_replace($current_theme_url,$child_theme_url,$fileToRead))) {
+		if(fopen(str_replace($current_theme_url,$child_theme_url,$fileToRead), 'r')) { //child theme exists
+			$fileToRead = str_replace($current_theme_url,$child_theme_url,$fileToRead);
+			$f = fopen($fileToRead, 'r');
+		} else {
+			$f = fopen($fileToRead, 'r');
+		}
+		$tagContents = fread($f, filesize($fileToRead));
+		$tagContents = htmlspecialchars( $tagContents );
 	}
-	$tagContents = fread($f, filesize($fileToRead));
-	$tagContents = htmlspecialchars( $tagContents );
 	
 	return $tagContents;
 }
