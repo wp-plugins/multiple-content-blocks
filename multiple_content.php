@@ -3,7 +3,7 @@
 Plugin Name: Multiple content blocks
 Plugin URI: http://plugins.trendwerk.nl/documentation/multiple-content-blocks/
 Description: Lets you use more than one content "block" on a template. You only have to insert one tag inside the template, so it's easy to use.
-Version: 2.1
+Version: 2.2
 Author: Ontwerpstudio Trendwerk
 Author URI: http://plugins.trendwerk.nl/
 */
@@ -132,17 +132,10 @@ function add_multiplecontent_box() {
 		global $current_user;
 		get_currentuserinfo();
 		
-
-		if(get_usermeta($current_user->ID,'rich_editing') == 'true') {
-			//leave this away when wysigwyg is disabled
-			echo '<a id="edButtonHTML" class="hide-if-no-js" onclick="switchEditors.go(\'multiplecontent_box-'.$fieldName.'\', \'html\');">HTML</a><a id="edButtonPreview" class="active hide-if-no-js" onclick="switchEditors.go(\'multiplecontent_box-'.$fieldName.'\', \'tinymce\');">Wysiwyg</a>';
-		}
-		
 		echo '<input type="hidden" name="multiplecontent_box-'.$fieldName.'-nonce" id="multiplecontent_box-'.$fieldName.'-nonce" value="'.wp_create_nonce("multiplecontent_box-".$fieldName."-nonce").'" />'."\n";  //nonce
-		echo '<textarea id="multiplecontent_box-'.$fieldName.'" tabindex="2" name="multiplecontent_box-'.$fieldName.'" cols="158" class="theEditor" rows="15">';
-			$content = get_post_meta($post->ID, '_ot_multiplecontent_box-'.$fieldName , true);
-			echo apply_filters('the_editor_content', $content);
-		echo '</textarea>';
+		
+		wp_editor( get_post_meta($post->ID, '_ot_multiplecontent_box-'.$fieldName , true), 'multiplecontent_box-'.$fieldName, $settings = array() );
+		
 		echo '<p>&nbsp;</p>';
 	}
 	

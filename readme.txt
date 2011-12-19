@@ -3,8 +3,8 @@ Contributors: Ontwerpstudio Trendwerk, Harold Angenent
 Donate link: http://plugins.trendwerk.nl
 Tags: multiple,content,blocks,multiplecontent,page,pageblocks
 Requires at least: 2.8
-Tested up to: 3.2.1
-Stable tag: 2.1
+Tested up to: 3.3
+Stable tag: 2.2
 
 Lets you use more than one content "block" on a template. You only have to insert one tag inside the template, so it's easy to use.
 
@@ -40,6 +40,10 @@ Use the function get_the_block instead of the_block, like this: `<?php $content_
 2. The edit page will get the editors
 
 == Changelog ==
+
+= 2.2 =
+* Implemented the new editor function
+* Compatible with 3.3!
 
 = 2.1 =
 * Fixed the bug that caused errors to show in the meta box when there was no template
