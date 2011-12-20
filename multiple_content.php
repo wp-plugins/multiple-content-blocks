@@ -3,7 +3,7 @@
 Plugin Name: Multiple content blocks
 Plugin URI: http://plugins.trendwerk.nl/documentation/multiple-content-blocks/
 Description: Lets you use more than one content "block" on a template. You only have to insert one tag inside the template, so it's easy to use.
-Version: 2.2
+Version: 2.2.1
 Author: Ontwerpstudio Trendwerk
 Author URI: http://plugins.trendwerk.nl/
 */
@@ -121,6 +121,12 @@ function add_multiplecontent_box() {
 		} else {
 			$editorName = str_replace('\'','', str_replace('&quot;','',str_replace('get_the_block(','',str_replace($stringLast,'',$stringFirst))));
 		}
+		
+		//Support for different code annotation
+		//Possibly remove the first and last space. You would be an idiot to WANT them there.
+		if(substr($editorName,0,1) == ' ') $editorName = substr($editorName,1);
+		if(substr($editorName,strlen($editorName)-1) == ' ') $editorName = substr($editorName,0,strlen($editorName)-1);
+		
 		$nextString = $stringLast;
 		
 		//add editor
@@ -151,8 +157,12 @@ function read_tag($tag,$contents) {
 		return '';
 	}
 	
+	$theTag = str_replace('get_'.$tag.'( ','',$theTag); //Different annotation (eg. get_header( 'name '))
 	$theTag = str_replace('get_'.$tag.'(','',$theTag);
-	if(strpos($theTag,')') != 0) {
+	
+	if(strpos($theTag,' )') != 0) { //Different annotation (eg. get_header( 'name '))
+		$theTag = substr($theTag,0, strpos($theTag,' )'));
+	} else if(strpos($theTag,')') != 0) {
 		$theTag = substr($theTag,0, strpos($theTag,')'));
 	} else {
 		$theTag = '';
