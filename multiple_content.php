@@ -59,7 +59,7 @@ function add_multiplecontent_box() {
 			}
 		}
 	}
-	$fileToRead = validate_file_to_edit($fileToRead, $allowed_files);
+	$fileToRead = validate_file_to_edit($fileToRead);
 	$fileToRead = get_real_file_to_edit($fileToRead);
 
 	//first try to read the child theme, otherwise use the normal theme
@@ -84,6 +84,7 @@ function add_multiplecontent_box() {
 		$footercontents = read_tag('footer',$contents);
 		
 		//multiple sidebars, v1.2
+		$sidebarcontents = '';
 		$amount_sidebars = substr_count($contents,'get_sidebar(');
 		$nextContent = $contents;
 		for($i=0;$i<$amount_sidebars;$i++) {
@@ -178,7 +179,7 @@ function read_tag($tag,$contents) {
 	}
 	$fileToRead .= '.php';
 	$fileToRead = strstr($fileToRead,'/themes/');
-	$fileToRead = validate_file_to_edit($fileToRead, $allowed_files);
+	$fileToRead = validate_file_to_edit($fileToRead);
 	$fileToRead = get_real_file_to_edit($fileToRead);
 
 
@@ -205,6 +206,7 @@ function read_tag($tag,$contents) {
 function save_multiplecontent_box($id) {
 	for($i=0;$i>-1;$i++) {
 		$fieldName = ''; //reset fieldName
+		if(!isset($_POST['multiplecontent_box-'.$i])) break;
 		$fieldName = $_POST['multiplecontent_box-'.$i];
 		
 		if (!wp_verify_nonce($_POST['multiplecontent_box-'.$fieldName.'-nonce'],"multiplecontent_box-".$fieldName."-nonce")) return $id; //nonce
