@@ -36,7 +36,12 @@ add_action('admin_head','multiplecontent_css');
 function add_multiplecontent_box() {
 	//check which template is used
 	global $post;
-	$fileToRead = get_template_directory_uri().'/'.$post->page_template;
+	
+	if(isset($post->page_template)) {
+		$fileToRead = get_template_directory_uri().'/'.$post->page_template;
+	} else {
+		$fileToRead = get_template_directory_uri().'/';
+	}
 	
 	//read the template
 	$fileToRead = strstr($fileToRead,'/themes/');
@@ -199,6 +204,8 @@ function read_tag($tag,$contents) {
 		$tagContents = fread($f, filesize($fileToRead));
 		$tagContents = htmlspecialchars( $tagContents );
 	}
+	
+	if(!isset($tagContents)) $tagContents = '';
 	
 	return $tagContents;
 }
