@@ -168,7 +168,9 @@ function read_tag($tag,$contents) {
 	
 	if(strpos($theTag,' )') != 0) { //Different annotation (eg. get_header( 'name '))
 		$theTag = substr($theTag,0, strpos($theTag,' )'));
-	} else if(strpos($theTag,')') != 0) {
+	} 
+	
+	if(strpos($theTag,')') != 0) {
 		$theTag = substr($theTag,0, strpos($theTag,')'));
 	} else {
 		$theTag = '';
