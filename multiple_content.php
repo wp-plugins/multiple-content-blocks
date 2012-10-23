@@ -47,7 +47,9 @@ function add_multiplecontent_box() {
 	$fileToRead = strstr($fileToRead,'/themes/');
 	if(substr(strrchr($fileToRead,'/'),1) == 'default' || substr(strrchr($fileToRead,'/'),1) == '') { //fix for 2.9
 		if(substr(strrchr($fileToRead,'/'),1)) {
-			if($post->post_type == 'post') {
+			if($post->ID == get_option('page_on_front')) {
+				$fileToRead = substr($fileToRead, 0 ,-7) . 'front-page.php';
+			} else if($post->post_type == 'post') {
 				$fileToRead = substr($fileToRead, 0 ,-7) . 'single.php';
 			} else if($post->post_type == 'page') {
 				$fileToRead = substr($fileToRead, 0 ,-7) . 'page.php';
@@ -55,7 +57,9 @@ function add_multiplecontent_box() {
 				$fileToRead = substr($fileToRead, 0 ,-7) . 'single-'.$post->post_type.'.php';
 			}
 		} else {
-			if($post->post_type == 'post') {
+			if($post->ID == get_option('page_on_front')) {
+				$fileToRead .= 'front-page.php';
+			} else if($post->post_type == 'post') {
 				$fileToRead .= 'single.php';
 			} else if($post->post_type == 'page') {
 				$fileToRead .= 'page.php';
