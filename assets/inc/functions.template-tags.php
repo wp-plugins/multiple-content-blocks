@@ -33,17 +33,28 @@ function get_the_block($name,$args=array()) {
 			'type' => 'editor',
 			'apply_filters' => true
 		);
-	    $args = wp_parse_args($args, $defaults);
-	    
+		$args = wp_parse_args($args, $defaults);
+		
 		mcb_register_block($post->ID,$name,$args['type']);
 		
-	    $meta = get_post_meta($post->ID,'mcb-'.sanitize_title($name),true);
-	    
-	    if($args['apply_filters']) return apply_filters('the_content',$meta);
-	    if($meta && count($meta) > 0) return $meta;
+		$meta = get_post_meta($post->ID,'_mcb-'.sanitize_title($name),true);
+		
+		if($args['apply_filters']) return apply_filters('the_content',$meta);
+		if($meta && count($meta) > 0) return htmlentities($meta,null,'UTF-8',false);
 	endif;
 	
-    return '';
+	return '';
+}
+
+/**
+ * Check if the block has content
+ *
+ * @param string $name
+ * @param array $args Optional. Additional arguments, see get_the_block for more information
+ */
+function has_block($name,$args=array()) {
+	if(strlen(get_the_block($name,$args)) > 0) return true;
+	return false;
 }
 
 /**
@@ -54,13 +65,15 @@ function get_the_block($name,$args=array()) {
  * @param string $type optional The name of the style, either 'editor' or 'one-liner' (defaults to 'editor')
  */
 function mcb_register_block($post_id,$name,$type='editor') {
+	if($name == 'blocks') return;
+	
 	if(!mcb_block_exists($post_id,$name,$type)) {
-		$blocks = get_post_meta($post_id,'mcb-blocks',true);
+		$blocks = get_post_meta($post_id,'_mcb-blocks',true);
 		if(!is_array($blocks)) $blocks = array();
 		
 		$blocks[sanitize_title($name)] = array('name' => $name, 'type' => $type);
 		
-		update_post_meta($post_id,'mcb-blocks',$blocks);
+		update_post_meta($post_id,'_mcb-blocks',$blocks);
 	}
 }
 
@@ -73,7 +86,7 @@ function mcb_register_block($post_id,$name,$type='editor') {
  * @return bool
  */
 function mcb_block_exists($post_id,$name,$type='editor') {
-	$blocks = get_post_meta($post_id,'mcb-blocks',true);
+	$blocks = get_post_meta($post_id,'_mcb-blocks',true);
 	if(is_array($blocks) && in_array(sanitize_title($name), $blocks)) :
 		if(is_array($blocks[sanitize_title($name)])) :
 	  		$comparable_name = $blocks[sanitize_title($name)]['name'];
@@ -96,7 +109,7 @@ function mcb_block_exists($post_id,$name,$type='editor') {
  */
 function mcb_refresh_blocks() {
 	global $post;
-	if(isset($post)) delete_post_meta($post->ID,'mcb-blocks');
+	if(isset($post)) delete_post_meta($post->ID,'_mcb-blocks');
 }
 add_action('wp_head','mcb_refresh_blocks');
 ?>
