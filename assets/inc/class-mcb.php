@@ -75,9 +75,13 @@ class MCB {
 				echo '<p><strong>' . $label . '</strong></p>';
 
 				if( 'one-liner' == $type )
-				  echo '<input type="text" name="' . $id . '" value="' . htmlentities( get_post_meta( $post->ID, '_mcb-' . $id, true ), null, 'UTF-8', false ) . '" />';
+				  echo '<input type="text" name="' . $id . '" value="' . htmlentities( get_post_meta( $post->ID, '_mcb-' . $id, true ), ENT_COMPAT, 'UTF-8', false ) . '" />';
 				else
-					wp_editor( get_post_meta( $post->ID, '_mcb-' . $id, true ), $id );
+					wp_editor( get_post_meta( $post->ID, '_mcb-' . $id, true ), '_mcb_' . $id, array(
+						'tinymce'              => array(
+							'wp_autoresize_on' => false,
+						),
+					) );
 			}
 			
 			if( true === (bool) get_option( 'mcb-disable-http-requests' ) ) {
@@ -136,7 +140,7 @@ class MCB {
 						<tr class="mcb-content">
 							<td colspan="2">
 								<p class="description"><?php _e( 'The content displayed below will not be saved. This is just for recovery purposes.', 'mcb' ); ?></p>
-								<?php wp_editor( get_post_meta( $post->ID, '_mcb-' . $id, true), $id . '-inactive', array( 'media_buttons' => false ) ); ?>
+								<?php wp_editor( get_post_meta( $post->ID, '_mcb-' . $id, true), '_mcb_' . $id . '_inactive', array( 'media_buttons' => false ) ); ?>
 							</td>
 						</tr>
 					<?php } ?>
@@ -151,7 +155,7 @@ class MCB {
 	 * Maybe delete a block
 	 */
 	function maybe_delete_block() {
-		if( $_GET['delete_mcb'] ) {
+		if( isset( $_GET['delete_mcb'] ) ) {
 			global $post;
 			delete_post_meta( $post->ID, '_mcb-' . $_GET['delete_mcb'] );
 		}
@@ -172,7 +176,7 @@ class MCB {
 		if( isset( $_REQUEST['doing_wp_cron'] ) )
 			return;
 			
-		if( isset( $_REQUEST['post_view'] ) && $_REQUEST['post_view'] == 'list' )
+		if( isset( $_REQUEST['post_view'] ) )
 		    return;
 
 		/**
@@ -184,8 +188,8 @@ class MCB {
 		
 		if( $blocks ) {
 			foreach( $blocks as $id => $args ) {
-				if( isset( $_POST[ $id ] ) )
-					update_post_meta( $post_id, '_mcb-' . $id, apply_filters( 'content_save_pre', $_POST[ $id ] ) );
+				if( isset( $_POST[ '_mcb_' . $id ] ) )
+					update_post_meta( $post_id, '_mcb-' . $id, apply_filters( 'content_save_pre', $_POST[ '_mcb_' . $id ] ) );
 			}
 		}
 	}
@@ -221,7 +225,15 @@ class MCB {
 		$type = get_post_type_object( $post->post_type );
 		
 		if( 'publish' == $post->post_status && $type->public ) {
-			$request = wp_remote_get( get_permalink( $post_id ) );
+			$args = array();
+			$request_url = get_permalink( $post_id );
+
+			if( isset( $_SERVER['PHP_AUTH_USER'] ) && 0 < strlen( $_SERVER['PHP_AUTH_USER'] ) && isset( $_SERVER['PHP_AUTH_PW'] ) && 0 < strlen( $_SERVER['PHP_AUTH_PW'] ) )
+				$args['headers'] = array(
+					'Authorization' => 'Basic ' . base64_encode( esc_attr( $_SERVER['PHP_AUTH_USER'] ) . ':' . esc_attr( $_SERVER['PHP_AUTH_PW'] ) ),
+				);
+
+			$request = wp_remote_get( $request_url, $args );
 
 			if( is_wp_error( $request ) || 200 != $request['response']['code'] ) //HTTP Request failed: Tell the user to do this manually					
 				return new WP_Error( 'mcb', sprintf( __( '<p>It doesn\'t look like we can automatically initialize the blocks. <a href="%1$s" target="_blank">Visit this page</a> in the front-end and then try again.</p><p>To turn off this option entirely, go to the <a href="%2$s">settings page</a> and disable HTTP Requests. You will still need to perform the steps above.</p>', 'mcb' ), get_permalink( $post_id ), admin_url( 'options-general.php?page=mcb-settings' ) ) );
@@ -251,7 +263,7 @@ class MCB {
 			foreach( $all_blocks as $inactive_block ) {
 				$id = str_replace( '_mcb-', '', $inactive_block->meta_key );
 				
-				if( $blocks[ $id ] )
+				if( isset( $blocks[ $id ] ) )
 					continue;
 				
 				$inactive_blocks[] = $inactive_block;
